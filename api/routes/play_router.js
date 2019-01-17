@@ -36,6 +36,7 @@ router.route("/create").post((req, res) => {
           cards: splitCards(shuffled_cards.cards, new_game.players, player)
         });
       });
+      var isPlayer1 = true;
       playersWithCards.forEach(player => {
         players_series.push(function (cb) {
           PlayersModel.findByIdAndUpdate(
@@ -49,8 +50,10 @@ router.route("/create").post((req, res) => {
               players.push({
                 user_id: pl._id,
                 name: pl.name,
-                status: 0
+                status: 0,
+                isTurn: isPlayer1
               });
+              isPlayer1 = false
               cb();
             }
           );
@@ -125,91 +128,112 @@ router.route("/:id").post((req, res) => {
           var player_index = game.players.findIndex(pl => {
             return pl.user_id.toString() === player._id.toString();
           });
-          var player2_index = player_index + 1;
-          while (!game.players[player2_index] ||
-            game.players[player2_index].status > 0) {
-            player2_index = game.players[player2_index] ? player2_index + 1 : 0
-          }
-          console.log("players: " + player2_index + ":" + player_index);
-          if (player2_index !== player_index) {
-            CardsModel.findById(req.body.card, (err, card) => {
-              if (card) {
-                var new_cards = [];
-                player.current_game.cards.forEach(crd => {
-                  if (crd._id.toString() !== card._id.toString()) {
-                    new_cards.push(crd);
-                  } else {
-                    console.log(crd._id);
-                  }
-                });
-                PlayersModel.findByIdAndUpdate(
-                  req.params.id, {
-                    "current_game.cards": new_cards
-                  }, {
-                    new: true
-                  },
-                  (err, player1) => {
-                    console.log("player1: " + player2_index + JSON.stringify(player1));
+          if (game.players[player_index].isTurn) {
+            var player2_index = player_index + 1;
+            while (!game.players[player2_index] ||
+              game.players[player2_index].status > 0) {
+              player2_index = game.players[player2_index] ? player2_index + 1 : 0
+            }
+            console.log("players: " + player2_index + ":" + player_index);
+            if (player2_index !== player_index) {
+              CardsModel.findById(req.body.card, (err, card) => {
+                if (card) {
+                  var new_cards = [];
+                  player.current_game.cards.forEach(crd => {
+                    if (crd._id.toString() !== card._id.toString()) {
+                      new_cards.push(crd);
+                    } else {
+                      console.log(crd._id);
+                    }
+                  });
+                  PlayersModel.findByIdAndUpdate(
+                    req.params.id, {
+                      "current_game.cards": new_cards
+                    }, {
+                      new: true
+                    },
+                    (err, player1) => {
+                      console.log("player1: " + player2_index + JSON.stringify(player1));
 
-                    PlayersModel.findByIdAndUpdate(
-                      game.players[player2_index].user_id, {
-                        $push: {
-                          "current_game.cards": card
-                        }
-                      },
-                      (err, player2) => {
-                        var activity = new ActivityModel();
-                        activity.game = game._id;
-                        activity.player = {
-                          from: player1._id,
-                          to: player2._id
-                        };
-                        activity.save(err => {
-                          if (new_cards.length === 0) {
-                            GameModel.findById(
-                              player.current_game.game_id,
-                              (err, game) => {
-                                if (game) {
-                                  var updated_players = [];
-                                  game.players.forEach(player => {
-                                    if (player.user_id.toString() === req.params.id.toString()) {
-                                      player.status = 1;
-                                    }
-                                    updated_players.push(player);
-                                  });
-                                  GameModel.findByIdAndUpdate(
-                                    player.current_game.game_id, {
-                                      players: updated_players
-                                    },
-                                    (err, updated_game) => {
-                                      console.log(JSON.stringify(updated_game));
-                                      res.json({
-                                        message: "Great ! You win on this match"
-                                      });
-                                    }
-                                  );
-                                }
-                              }
-                            );
-                          } else {
-                            res.json(player1);
+                      PlayersModel.findByIdAndUpdate(
+                        game.players[player2_index].user_id, {
+                          $push: {
+                            "current_game.cards": card
                           }
-                        });
-                      }
-                    );
-                  }
-                );
-              }
-            });
+                        },
+                        (err, player2) => {
+                          var activity = new ActivityModel();
+                          activity.game = game._id;
+                          activity.player = {
+                            from: player1._id,
+                            to: player2._id
+                          };
+                          activity.save(err => {
+                            nextTurn(game, player2_index, (err, result) => {
+                              if (new_cards.length === 0) {
+                                var updated_players = [];
+                                game.players.forEach(player => {
+                                  if (player.user_id.toString() === req.params.id.toString()) {
+                                    player.status = 1;
+                                  }
+                                  updated_players.push(player);
+                                });
+                                GameModel.findByIdAndUpdate(
+                                  player.current_game.game_id, {
+                                    players: updated_players
+                                  },
+                                  (err, updated_game) => {
+                                    console.log(JSON.stringify(updated_game));
+                                    res.json({
+                                      message: "Great ! You win on this match"
+                                    });
+                                  }
+                                );
+                              } else {
+                                res.json(player1);
+                              }
+                            })
+                          });
+                        }
+                      );
+                    }
+                  );
+                }
+              });
+            } else {
+              res.json({
+                message: "Sorry ! You lose. You got the pair of the hidden card: " + game.hidden_card.card + " of " + game.hidden_card.sign
+              });
+            }
           } else {
             res.json({
-              message: "Sorry ! You lose. You got the pair of the hidden card: " + game.hidden_card.card + " of " + game.hidden_card.sign
-            });
+              message: "Oops. It's not your turn"
+            })
           }
         }
       });
     }
   });
 });
+
+function nextTurn(game, player2_index, cb) {
+  var updated_players = [];
+  for (let a = 0; a < game.players.length; a++) {
+    var pl = game.players[a];
+    if (player2_index === a) {
+      pl.isTurn = true;
+    } else {
+      pl.isTurn = false;
+    }
+    updated_players.push(pl)
+  }
+  GameModel.findByIdAndUpdate(game._id, {
+    players: updated_players
+  }, {
+    new: true
+  }, (err, game) => {
+    cb(err, game)
+  })
+}
 
 module.exports = router;
