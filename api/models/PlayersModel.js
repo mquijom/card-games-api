@@ -10,20 +10,7 @@ var PlayersModelSchema = new mongoose.Schema({
         game_id: {
             type: String
         },
-        cards: [{
-            __v: {
-                type: String
-            },
-            card: {
-                type: String
-            },
-            sign: {
-                type: String
-            },
-            _id: {
-                type: String
-            }
-        }]
+        cards: []
     },
     games_history: []
 })
