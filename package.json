@@ -1,0 +1,25 @@
+{
+  "name": "ccci-cards",
+  "version": "1.0.0",
+  "description": "CCCI Cards Play",
+  "main": "app.js",
+  "scripts": {
+    "start": "node bin/server.js",
+    "dev": "nodemon bin/server.js"
+  },
+  "author": "Mark",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "moment": "^2.22.2",
+    "mongodb": "^2.2.33",
+    "mongoose": "^4.13.10",
+    "mongoose-auto-increment-reworked": "^1.2.1",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.18.4",
+    "request": "^2.85.0"
+  }
+}
