@@ -139,7 +139,8 @@ router.route("/pair/:id").get((req, res) => {
                             })
                         } else {
                             res.json({
-                                message: "Sorry ! You lose. You got the pair of the hidden card: " + game.hidden_card.card + " of " + game.hidden_card.sign
+                                message: "Sorry ! You lose. You got the pair of the hidden card.",
+                                hidden_card: game.hidden_card
                             });
                         }
                     })
