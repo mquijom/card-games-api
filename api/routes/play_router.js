@@ -137,6 +137,7 @@ router.route("/:id").post((req, res) => {
             console.log("players: " + player2_index + ":" + player_index);
             if (player2_index !== player_index) {
               CardsModel.findById(req.body.card, (err, card) => {
+                console.log('card:' + JSON.stringify(req.body.card))
                 if (card) {
                   var new_cards = [];
                   player.current_game.cards.forEach(crd => {
