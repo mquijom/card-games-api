@@ -64,6 +64,22 @@ function getCode(num) {
     }
 }
 
+router.route('/isturn/:id').get((req, res) => {
+    PlayersModel.findById(req.params.id, (err, player) => {
+        GameModel.findById(player.current_game.game_id, (err, game) => {
+            var isTurn = false;
+            game.players.forEach(pl => {
+                if (pl.user_id.toString() === player._id.toString()) {
+                    isTurn = pl.isTurn;
+                }
+            })
+            res.json({
+                isTurn: isTurn
+            })
+        })
+    })
+})
+
 router.route("/:id").get((req, res) => {
     PlayersModel.findById(req.params.id, (err, player) => {
         player.current_game.total_cards = player.current_game.cards.length
