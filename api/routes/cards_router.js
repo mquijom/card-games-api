@@ -103,9 +103,15 @@ router.route("/pair/:id").get((req, res) => {
                     GameModel.findById(player.current_game.game_id, (err, game) => {
                         if (game) {
                             var updated_players = []
+                            var search_next_turn = false;
                             game.players.forEach(player => {
+                                player.isTurn = false;
                                 if (player.user_id.toString() === req.params.id.toString()) {
                                     player.status = 1
+                                    search_next_turn = true
+                                } else if (search_next_turn && player.status === 0) {
+                                    player.isTurn = true;
+                                    search_next_turn = false;
                                 }
                                 updated_players.push(player)
                             })
