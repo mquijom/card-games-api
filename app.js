@@ -17,6 +17,7 @@ app.use(
 
 app.use('/api/cards', require('./api/routes/cards_router'))
 app.use('/api/play', require('./api/routes/play_router'))
+app.use('/api/users', require('./api/routes/users_router'))
 
 // DB Connection
 //#############################################################################
