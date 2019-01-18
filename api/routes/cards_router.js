@@ -67,14 +67,14 @@ function getCode(num) {
 router.route('/isturn/:id').get((req, res) => {
     PlayersModel.findById(req.params.id, (err, player) => {
         GameModel.findById(player.current_game.game_id, (err, game) => {
-            var isTurn = false;
+            var players_turn = "";
             game.players.forEach(pl => {
-                if (pl.user_id.toString() === player._id.toString()) {
-                    isTurn = pl.isTurn;
+                if (pl.isTurn) {
+                    players_turn = pl.name.toString();
                 }
             })
             res.json({
-                isTurn: isTurn
+                players_turn: players_turn
             })
         })
     })
