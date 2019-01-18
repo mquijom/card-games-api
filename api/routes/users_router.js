@@ -10,9 +10,9 @@ router.route('/:user').get((req, res) => {
         if (player) {
             player.current_game = null;
             player.games_history = null;
-            res.json(player)
+            res.status(200).json(player)
         } else {
-            res.json({
+            res.status(403).json({
                 message: 'Invalid Request. User does not exist'
             })
         }
