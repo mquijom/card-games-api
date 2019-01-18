@@ -91,7 +91,7 @@ router.route("/:id").get((req, res) => {
             })
         } else {
             res.status(400).json({
-                message: 'Invalid Request. User does not exist'
+                message: 'Invalid Request. User ID is required.'
             })
         }
     })
