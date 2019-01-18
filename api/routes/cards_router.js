@@ -126,7 +126,8 @@ router.route("/pair/:id").get((req, res) => {
                             }, (err, updated_game) => {
                                 console.log(JSON.stringify(updated_game))
                                 res.json({
-                                    message: "Great ! You win on this match"
+                                    message: "Great ! You win on this match",
+                                    hidden_card: game.hidden_card
                                 })
                             })
                         }
