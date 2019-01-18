@@ -86,7 +86,7 @@ router.route("/:id").get((req, res) => {
             player.current_game.total_cards = player.current_game.cards.length
             console.log(player.current_game.cards.length)
             res.status(200).json({
-                model: player,
+                cards: player.current_game.cards,
                 total_cards_onhand: player.current_game.cards.length
             })
         } else {
