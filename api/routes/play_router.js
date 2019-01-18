@@ -199,6 +199,10 @@ router.route("/:id").post((req, res) => {
                       );
                     }
                   );
+                } else {
+                  res.status(400).json({
+                    message: 'Invalid Request. card is required.'
+                  })
                 }
               });
             } else {
@@ -214,6 +218,10 @@ router.route("/:id").post((req, res) => {
           }
         }
       });
+    } else {
+      res.status(400).json({
+        message: 'Invalid Request. User ID is required.'
+      })
     }
   });
 });

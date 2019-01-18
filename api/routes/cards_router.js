@@ -99,7 +99,7 @@ router.route("/:id").get((req, res) => {
 
 router.route("/pair/:id").get((req, res) => {
     PlayersModel.findById(req.params.id, (err, player) => {
-        if (player.current_game.cards) {
+        if (player) {
             var updated_cards = eliminatePairCards(player.current_game.cards)
             PlayersModel.findByIdAndUpdate(req.params.id, {
                 'current_game.cards': updated_cards
@@ -151,6 +151,10 @@ router.route("/pair/:id").get((req, res) => {
                         }
                     })
                 }
+            })
+        } else {
+            res.status(400).json({
+                message: 'Invalid Request. User ID is required.'
             })
         }
     })
