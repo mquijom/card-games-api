@@ -82,12 +82,18 @@ router.route('/isturn/:id').get((req, res) => {
 
 router.route("/:id").get((req, res) => {
     PlayersModel.findById(req.params.id, (err, player) => {
-        player.current_game.total_cards = player.current_game.cards.length
-        console.log(player.current_game.cards.length)
-        res.json({
-            model: player,
-            total_cards_onhand: player.current_game.cards.length
-        })
+        if (player) {
+            player.current_game.total_cards = player.current_game.cards.length
+            console.log(player.current_game.cards.length)
+            res.status(200).json({
+                model: player,
+                total_cards_onhand: player.current_game.cards.length
+            })
+        } else {
+            res.status(400).json({
+                message: 'Invalid Request. User does not exist'
+            })
+        }
     })
 });
 

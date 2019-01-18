@@ -8,8 +8,8 @@ router.route('/:user').get((req, res) => {
         name: req.params.user
     }, (err, player) => {
         if (player) {
-            player.current_game = null;
-            player.games_history = null;
+            player.current_game = undefined;
+            player.games_history = undefined;
             res.status(200).json(player)
         } else {
             res.status(403).json({
