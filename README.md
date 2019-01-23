@@ -1,1 +1,1 @@
-# pairing-cards-game
+# card-games-api
